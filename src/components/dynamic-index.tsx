@@ -8,6 +8,13 @@ import {
   fetchUsers,
 } from "@/components/API";
 import React, { Suspense } from "react";
+import {
+  getBodyType,
+  getMakers,
+  getMaxAndMinPrice,
+  getThirdPartBodyType,
+  getThirdPartMakers,
+} from "./pqs-api";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -16,13 +23,34 @@ type Props = {
 export const experimental_ppr = true;
 
 const DynamicIndex = async ({ searchParams }: Props) => {
-  const [comments, posts, users, todos, albums, photos] = await Promise.all([
+  const [
+    comments,
+    posts,
+    users,
+    todos,
+    albums,
+    photos,
+    bulkMakerData,
+    bulkBodyTypeData,
+    orderMakerData,
+    orderBodyTypeData,
+    maxMinPrice,
+    maxMinMileage,
+    maxMinEngineCC,
+  ] = await Promise.all([
     fetchComments(),
     fetchPosts(),
     fetchUsers(),
     fetchTodos(),
     fetchAlbums(),
     fetchPhotos(),
+    getThirdPartMakers(),
+    getThirdPartBodyType(),
+    getMakers(),
+    getBodyType(),
+    getMaxAndMinPrice("/api/common/getFobPriceRange"),
+    getMaxAndMinPrice("/api/common/getMileage"),
+    getMaxAndMinPrice("/api/common/getEngineSizeCC"),
   ]);
 
   const getLength = () => {
@@ -37,6 +65,16 @@ const DynamicIndex = async ({ searchParams }: Props) => {
   };
 
   const length = getLength();
+
+  console.log(
+    bulkMakerData,
+    bulkBodyTypeData,
+    orderMakerData,
+    orderBodyTypeData,
+    maxMinPrice,
+    maxMinMileage,
+    maxMinEngineCC
+  );
 
   return (
     <div>
